@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StyleHub - Admin Dashboard</title>
+  <meta name="description" content="StyleHub E-Commerce Store Administrator Portal">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- =========================================================================
+       TOAST CONTAINER
+       ========================================================================= -->
+  <div id="toast-container"></div>
+
+  <!-- =========================================================================
+       LOGIN SCREEN OVERLAY
+       ========================================================================= -->
+  <div id="login-overlay">
+    <div class="login-card">
+      <div class="login-logo">
+        <i class="fas fa-crown"></i>
+      </div>
+      <h2 style="font-size:24px; font-weight:800; margin-bottom:8px;">StyleHub Admin</h2>
+      <p style="font-size:13px; color:#94a3b8; margin-bottom:28px;">Sign in to access analytics, manage products & orders</p>
+
+      <form id="login-form">
+        <div class="form-group" style="text-align:left;">
+          <label>Admin Email</label>
+          <input type="email" id="login-email" class="form-control" placeholder="admin@stylehub.com" value="admin@stylehub.com" required>
+        </div>
+
+        <div class="form-group" style="text-align:left;">
+          <label>Password</label>
+          <input type="password" id="login-password" class="form-control" placeholder="••••••••" value="admin" required>
+        </div>
+
+        <button type="submit" id="login-submit-btn" class="btn btn-primary" style="width:100%; justify-content:center; padding:12px; margin-top:10px;">
+          Sign In to Dashboard
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MAIN ADMIN APP CONTAINER
+       ========================================================================= -->
+  <div id="app-container">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="brand-header">
+        <div class="brand-logo-icon">S</div>
+        <div>
+          <div class="brand-title">StyleHub</div>
+          <div style="font-size:11px; color:#64748b; font-weight:600; text-transform:uppercase;">Admin Portal</div>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <a class="nav-item active" data-tab="dashboard">
+          <i class="fas fa-chart-pie"></i>
+          <span>Analytics & Overview</span>
+        </a>
+        <a class="nav-item" data-tab="products">
+          <i class="fas fa-tshirt"></i>
+          <span>Products</span>
+        </a>
+        <a class="nav-item" data-tab="orders">
+          <i class="fas fa-shopping-bag"></i>
+          <span>Orders</span>
+        </a>
+        <a class="nav-item" data-tab="categories">
+          <i class="fas fa-tags"></i>
+          <span>Categories</span>
+        </a>
+        <a class="nav-item" data-tab="coupons">
+          <i class="fas fa-ticket-alt"></i>
+          <span>Coupons & Offers</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button id="logout-btn" class="btn btn-outline" style="width:100%; justify-content:center; color:#ef4444; border-color:rgba(239, 68, 68, 0.3);">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Sign Out</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+      <!-- HEADER -->
+      <header class="top-header">
+        <div class="header-title">
+          <h1 id="header-title-text">Analytics & Overview</h1>
+        </div>
+
+        <div class="header-actions">
+          <div class="admin-badge">
+            <span class="status-dot"></span>
+            <span id="admin-display-name">StyleHub Admin</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- VIEW CONTAINER -->
+      <div class="view-container">
+
+        <!-- ===============================================================
+             TAB VIEW 1: DASHBOARD
+             =============================================================== -->
+        <div id="view-dashboard" class="tab-view">
+          <!-- KPI Stats Grid -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <span class="stat-card-title">Total Revenue</span>
+                <div class="stat-card-icon icon-revenue"><i class="fas fa-rupee-sign"></i></div>
+              </div>
+              <div id="stat-revenue" class="stat-card-value">₹0</div>
+              <div class="stat-card-sub">Live total paid revenue</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <span class="stat-card-title">Total Orders</span>
+                <div class="stat-card-icon icon-orders"><i class="fas fa-shopping-cart"></i></div>
+              </div>
+              <div id="stat-orders" class="stat-card-value">0</div>
+              <div class="stat-card-sub">Customer orders placed</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <span class="stat-card-title">Active Products</span>
+                <div class="stat-card-icon icon-products"><i class="fas fa-box-open"></i></div>
+              </div>
+              <div id="stat-products" class="stat-card-value">0</div>
+              <div class="stat-card-sub">Items in database catalog</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <span class="stat-card-title">Registered Users</span>
+                <div class="stat-card-icon icon-users"><i class="fas fa-users"></i></div>
+              </div>
+              <div id="stat-users" class="stat-card-value">0</div>
+              <div class="stat-card-sub">Total customer accounts</div>
+            </div>
+          </div>
+
+          <!-- Charts -->
+          <div class="charts-grid">
+            <div class="card-panel">
+              <div class="panel-header">
+                <h3 class="panel-title">Sales & Revenue Trend</h3>
+                <span style="font-size:12px; color:#10b981; font-weight:600;"><i class="fas fa-circle" style="font-size:8px;"></i> Live Sync</span>
+              </div>
+              <div style="height:280px; position:relative;">
+                <canvas id="revenue-chart"></canvas>
+              </div>
+            </div>
+
+            <div class="card-panel">
+              <div class="panel-header">
+                <h3 class="panel-title">Order Status Ratio</h3>
+              </div>
+              <div style="height:280px; position:relative; display:flex; align-items:center; justify-content:center;">
+                <canvas id="orders-donut-chart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===============================================================
+             TAB VIEW 2: PRODUCTS
+             =============================================================== -->
+        <div id="view-products" class="tab-view" style="display:none;">
+          <div class="table-toolbar">
+            <div class="search-box">
+              <i class="fas fa-search" style="color:#64748b;"></i>
+              <input type="text" id="product-search" placeholder="Search product name, brand, category...">
+            </div>
+
+            <button class="btn btn-primary" onclick="Products.openAddModal()">
+              <i class="fas fa-plus"></i>
+              <span>Add New Product</span>
+            </button>
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Category</th>
+                  <th>Price</th>
+                  <th>Discount Price</th>
+                  <th>Stock</th>
+                  <th>Badges</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="products-table-body">
+                <!-- Dynamically loaded -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ===============================================================
+             TAB VIEW 3: ORDERS
+             =============================================================== -->
+        <div id="view-orders" class="tab-view" style="display:none;">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Customer</th>
+                  <th>Date</th>
+                  <th>Total Amount</th>
+                  <th>Payment</th>
+                  <th>Status</th>
+                  <th>Change Status</th>
+                </tr>
+              </thead>
+              <tbody id="orders-table-body">
+                <!-- Dynamically loaded -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ===============================================================
+             TAB VIEW 4: CATEGORIES
+             =============================================================== -->
+        <div id="view-categories" class="tab-view" style="display:none;">
+          <div class="table-toolbar">
+            <div></div>
+            <button class="btn btn-primary" onclick="Categories.openAddModal()">
+              <i class="fas fa-plus"></i>
+              <span>Add Category</span>
+            </button>
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Category Name</th>
+                  <th>Slug / Key</th>
+                  <th>Image</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="categories-table-body">
+                <!-- Dynamically loaded -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ===============================================================
+             TAB VIEW 5: COUPONS
+             =============================================================== -->
+        <div id="view-coupons" class="tab-view" style="display:none;">
+          <div class="table-toolbar">
+            <div></div>
+            <button class="btn btn-primary" onclick="Coupons.openAddModal()">
+              <i class="fas fa-plus"></i>
+              <span>Create Coupon</span>
+            </button>
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Coupon Code</th>
+                  <th>Discount</th>
+                  <th>Min Order</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="coupons-table-body">
+                <!-- Dynamically loaded -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- =========================================================================
+       MODALS
+       ========================================================================= -->
+
+  <!-- PRODUCT ADD/EDIT MODAL -->
+  <div id="product-modal" class="modal-overlay">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h2 id="product-modal-title">Add New Product</h2>
+        <button class="modal-close" onclick="Products.closeModal()">&times;</button>
+      </div>
+      <form id="product-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Product Title *</label>
+            <input type="text" id="prod-title" class="form-control" placeholder="e.g. Classic Oversized Hoodie" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Category</label>
+              <select id="prod-category" class="form-control">
+                <option value="">Select Category</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Brand</label>
+              <input type="text" id="prod-brand" class="form-control" placeholder="e.g. StyleHub Premium" value="StyleHub">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Original Price (₹) *</label>
+              <input type="number" id="prod-price" class="form-control" placeholder="1999" step="0.01" required>
+            </div>
+            <div class="form-group">
+              <label>Discount Price (₹)</label>
+              <input type="number" id="prod-discount" class="form-control" placeholder="1499" step="0.01">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Stock Quantity</label>
+              <input type="number" id="prod-stock" class="form-control" value="20" required>
+            </div>
+            <div class="form-group" style="display:flex; align-items:center; gap:20px; padding-top:28px;">
+              <label style="margin:0; cursor:pointer; display:flex; align-items:center; gap:6px;">
+                <input type="checkbox" id="prod-featured"> Featured
+              </label>
+              <label style="margin:0; cursor:pointer; display:flex; align-items:center; gap:6px;">
+                <input type="checkbox" id="prod-flash-sale"> Flash Sale
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Description</label>
+            <textarea id="prod-description" class="form-control" rows="3" placeholder="Enter product fabric, fit, and details..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="Products.closeModal()">Cancel</button>
+          <button type="submit" id="save-product-btn" class="btn btn-primary">Save Product</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- CATEGORY MODAL -->
+  <div id="category-modal" class="modal-overlay">
+    <div class="modal-container" style="max-width:480px;">
+      <div class="modal-header">
+        <h2>Add Category</h2>
+        <button class="modal-close" onclick="Categories.closeModal()">&times;</button>
+      </div>
+      <form id="category-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Category Name *</label>
+            <input type="text" id="cat-name" class="form-control" placeholder="e.g. Shoes, Jackets, Watches" required>
+          </div>
+          <div class="form-group">
+            <label>Image URL (Optional)</label>
+            <input type="url" id="cat-image" class="form-control" placeholder="https://images.unsplash.com/...">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="Categories.closeModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Category</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- COUPON MODAL -->
+  <div id="coupon-modal" class="modal-overlay">
+    <div class="modal-container" style="max-width:480px;">
+      <div class="modal-header">
+        <h2>Create Discount Coupon</h2>
+        <button class="modal-close" onclick="Coupons.closeModal()">&times;</button>
+      </div>
+      <form id="coupon-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Coupon Code *</label>
+            <input type="text" id="coupon-code" class="form-control" placeholder="e.g. FESTIVE50" style="text-transform:uppercase;" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Discount (%) *</label>
+              <input type="number" id="coupon-discount" class="form-control" placeholder="50" min="1" max="100" required>
+            </div>
+            <div class="form-group">
+              <label>Min Order (₹)</label>
+              <input type="number" id="coupon-min-order" class="form-control" placeholder="999">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="Coupons.closeModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Create Coupon</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- APPLICATION JAVASCRIPT MODULES -->
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/products.js"></script>
+  <script src="js/orders.js"></script>
+  <script src="js/categories.js"></script>
+  <script src="js/coupons.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
