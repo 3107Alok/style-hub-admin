@@ -126,12 +126,40 @@ const Products = {
   previewImage(url) {
     const previewEl = document.getElementById('prod-image-preview');
     if (previewEl) {
-      if (url && url.trim().startsWith('http')) {
+      if (url && (url.trim().startsWith('http') || url.trim().startsWith('data:image'))) {
         previewEl.src = url.trim();
       } else {
         previewEl.src = 'https://placehold.co/60x60?text=Preview';
       }
     }
+  },
+
+  handleFileUpload(input) {
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const base64 = e.target.result;
+        document.getElementById('prod-image').value = base64;
+        this.previewImage(base64);
+        Toast.success(`Selected image: ${file.name}`);
+      };
+      reader.readAsDataURL(file);
+    }
+  },
+
+  usePresetImage(category) {
+    const presets = {
+      dress: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&auto=format&fit=crop',
+      jeans: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=800&auto=format&fit=crop',
+      top: 'https://images.unsplash.com/photo-1564257631407-4deb1f99d992?w=800&auto=format&fit=crop',
+      shoes: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&auto=format&fit=crop',
+      saree: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=800&auto=format&fit=crop'
+    };
+    const url = presets[category] || presets.dress;
+    document.getElementById('prod-image').value = url;
+    this.previewImage(url);
+    Toast.success(`Applied ${category.toUpperCase()} preset photo!`);
   },
 
   openAddModal() {
