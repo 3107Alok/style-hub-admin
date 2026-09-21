@@ -21,7 +21,7 @@ const Auth = {
     const token = API.getToken();
     const user = API.getUser();
 
-    if (token && user && (user.role === 'ADMIN' || user.role === 'ROLE_ADMIN')) {
+    if (token && user && (user.role === 'ADMIN' || user.role === 'ROLE_ADMIN' || user.email === 'admin@stylehub.com')) {
       this.hideLogin();
       this.updateAdminHeader(user);
       App.loadCurrentView();
@@ -56,8 +56,9 @@ const Auth = {
       if (res && res.data) {
         const { accessToken, user } = res.data;
 
-        // Verify Admin Role
-        if (user.role !== 'ADMIN' && user.role !== 'ROLE_ADMIN') {
+        // Verify Admin Role or Master Admin Email
+        const isAdmin = user.role === 'ADMIN' || user.role === 'ROLE_ADMIN' || user.email === 'admin@stylehub.com';
+        if (!isAdmin) {
           Toast.error('Access Denied: This account does not have Admin privileges.');
           loginBtn.disabled = false;
           loginBtn.innerHTML = 'Sign In to Dashboard';
