@@ -61,7 +61,7 @@ const Products = {
     }
 
     tbody.innerHTML = products.map(p => {
-      const imgUrl = (p.images && p.images.length > 0) ? p.images[0] : 'https://placehold.co/100x100?text=StyleHub';
+      const imgUrl = (p.images && p.images.length > 0) ? p.images[0] : this.getCategoryPlaceholder(p.categoryName);
       const stockBadge = p.stock > 0 
         ? `<span class="badge badge-stock">${p.stock} in stock</span>`
         : `<span class="badge badge-out">Out of stock</span>`;
@@ -273,5 +273,21 @@ const Products = {
   escapeHtml(str) {
     if (!str) return '';
     return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  },
+
+  getCategoryPlaceholder(category) {
+    const cat = (category || '').toLowerCase();
+    if (cat.includes('dress')) return 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300&auto=format&fit=crop';
+    if (cat.includes('top')) return 'https://images.unsplash.com/photo-1564257631407-4deb1f99d992?w=300&auto=format&fit=crop';
+    if (cat.includes('jean')) return 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=300&auto=format&fit=crop';
+    if (cat.includes('t-shirt') || cat.includes('tshirt')) return 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=300&auto=format&fit=crop';
+    if (cat.includes('kurti')) return 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=300&auto=format&fit=crop';
+    if (cat.includes('saree')) return 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=300&auto=format&fit=crop';
+    if (cat.includes('shoe') || cat.includes('footwear')) return 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300&auto=format&fit=crop';
+    if (cat.includes('bag')) return 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=300&auto=format&fit=crop';
+    if (cat.includes('jewel') || cat.includes('access')) return 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=300&auto=format&fit=crop';
+    if (cat.includes('skirt')) return 'https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa?w=300&auto=format&fit=crop';
+    if (cat.includes('coord') || cat.includes('co-ord')) return 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=300&auto=format&fit=crop';
+    return 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=300&auto=format&fit=crop';
   }
 };
