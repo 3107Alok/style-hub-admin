@@ -17,8 +17,8 @@
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- Custom CSS -->
-  <link rel="stylesheet" href="css/style.css">
+  <!-- Custom CSS (StyleHub App Theme) -->
+  <link rel="stylesheet" href="css/style.css?v=3.0">
 </head>
 <body>
 
@@ -28,28 +28,28 @@
   <div id="toast-container"></div>
 
   <!-- =========================================================================
-       LOGIN SCREEN OVERLAY
+       LOGIN SCREEN OVERLAY (StyleHub Pink & White App Design)
        ========================================================================= -->
   <div id="login-overlay">
     <div class="login-card">
       <div class="login-logo">
         <i class="fas fa-crown"></i>
       </div>
-      <h2 style="font-size:24px; font-weight:800; margin-bottom:8px;">StyleHub Admin</h2>
-      <p style="font-size:13px; color:#94a3b8; margin-bottom:28px;">Sign in to access analytics, manage products & orders</p>
+      <h2 style="font-size:26px; font-weight:800; margin-bottom:8px; color:#222222; letter-spacing:-0.5px;">StyleHub Admin</h2>
+      <p style="font-size:13.5px; color:#777777; margin-bottom:28px;">Sign in to manage products, categories, orders & sales</p>
 
       <form id="login-form">
         <div class="form-group" style="text-align:left;">
-          <label>Admin Email</label>
+          <label style="color:#222222; font-weight:700;">Admin Email</label>
           <input type="email" id="login-email" class="form-control" placeholder="admin@stylehub.com" value="admin@stylehub.com" required>
         </div>
 
         <div class="form-group" style="text-align:left;">
-          <label>Password (Min 8 chars)</label>
+          <label style="color:#222222; font-weight:700;">Password (Min 8 chars)</label>
           <input type="password" id="login-password" class="form-control" placeholder="••••••••" value="admin1234" required>
         </div>
 
-        <button type="submit" id="login-submit-btn" class="btn btn-primary" style="width:100%; justify-content:center; padding:12px; margin-top:10px;">
+        <button type="submit" id="login-submit-btn" class="btn btn-primary" style="width:100%; justify-content:center; padding:13px; margin-top:14px; font-size:15px;">
           Sign In to Dashboard
         </button>
       </form>

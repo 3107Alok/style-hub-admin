@@ -52,7 +52,7 @@ const Orders = {
 
       return `
         <tr>
-          <td style="font-weight:700; color:#3b82f6;">#${(o.id || '').substring(0, 8)}</td>
+          <td style="font-weight:700; color:#d81b60;">#${(o.id || '').substring(0, 8)}</td>
           <td>
             <div style="font-weight:600;">${o.userName || 'Customer'}</div>
             <div style="font-size:12px; color:#64748b;">${o.userPhone || o.userEmail || ''}</div>

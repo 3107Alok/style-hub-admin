@@ -43,7 +43,7 @@ const Coupons = {
 
     tbody.innerHTML = coupons.map(c => `
       <tr>
-        <td><span class="badge" style="background:#3b82f6; color:white; font-size:13px;">${c.code}</span></td>
+        <td><span class="badge" style="background:#d81b60; color:white; font-size:13px;">${c.code}</span></td>
         <td style="font-weight:700; color:#10b981;">${c.discountPercentage ? c.discountPercentage + '%' : '₹' + c.discountAmount} OFF</td>
         <td style="color:#94a3b8;">Min Order: ₹${c.minOrderAmount || 0}</td>
         <td>
