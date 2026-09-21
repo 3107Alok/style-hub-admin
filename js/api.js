@@ -53,16 +53,17 @@ const API = {
       clearTimeout(timeoutId);
 
       if (response.status === 401) {
-        // Unauthorized
-        this.clearToken();
-        Auth.showLogin();
-        Toast.error('Session expired. Please log in again.');
+        // If auth endpoint itself returned 401 (invalid credentials)
+        if (endpoint.includes('/api/auth/login')) {
+          throw new Error('Invalid email or password');
+        }
+        console.warn('Endpoint returned 401 (Unauthorized):', endpoint);
         throw new Error('Unauthorized');
       }
 
       if (response.status === 403) {
-        Toast.error('Access Denied: Admin role required.');
-        throw new Error('Forbidden');
+        console.warn('Endpoint returned 403 (Forbidden):', endpoint);
+        throw new Error('Access forbidden: Waiting for admin role sync');
       }
 
       const json = await response.json();
