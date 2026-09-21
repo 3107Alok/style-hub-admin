@@ -68,12 +68,12 @@ const Dashboard = {
         datasets: [{
           label: 'Revenue (₹)',
           data: dataPoints,
-          borderColor: '#4f46e5',
-          backgroundColor: 'rgba(79, 70, 229, 0.1)',
+          borderColor: '#d81b60',
+          backgroundColor: 'rgba(216, 27, 96, 0.08)',
           fill: true,
           tension: 0.4,
           borderWidth: 3,
-          pointBackgroundColor: '#4f46e5',
+          pointBackgroundColor: '#d81b60',
           pointRadius: 4
         }]
       },
@@ -85,13 +85,13 @@ const Dashboard = {
         },
         scales: {
           x: {
-            grid: { color: '#1e293b' },
-            ticks: { color: '#94a3b8' }
+            grid: { color: '#fce4ec' },
+            ticks: { color: '#777777' }
           },
           y: {
-            grid: { color: '#1e293b' },
+            grid: { color: '#fce4ec' },
             ticks: {
-              color: '#94a3b8',
+              color: '#777777',
               callback: value => '₹' + value.toLocaleString('en-IN')
             }
           }
