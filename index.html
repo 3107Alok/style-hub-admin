@@ -502,17 +502,34 @@
         <div class="modal-body">
           <div class="form-group">
             <label>Coupon Code *</label>
-            <input type="text" id="coupon-code" class="form-control" placeholder="e.g. FESTIVE50" style="text-transform:uppercase;" required>
+            <input type="text" id="coupon-code" class="form-control" placeholder="e.g. FESTIVE50" style="text-transform:uppercase; font-weight:700; letter-spacing:1px;" required>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label>Discount (%) *</label>
-              <input type="number" id="coupon-discount" class="form-control" placeholder="50" min="1" max="100" required>
+              <label>Discount Type *</label>
+              <select id="coupon-type" class="form-control" onchange="Coupons.onTypeChange(this.value)">
+                <option value="PERCENTAGE">Percentage (%)</option>
+                <option value="FLAT">Flat Amount (₹)</option>
+              </select>
             </div>
             <div class="form-group">
-              <label>Min Order (₹)</label>
-              <input type="number" id="coupon-min-order" class="form-control" placeholder="999">
+              <label id="coupon-val-label">Discount Value (%) *</label>
+              <input type="number" id="coupon-discount" class="form-control" placeholder="20" min="1" required>
             </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Min Order Value (₹)</label>
+              <input type="number" id="coupon-min-order" class="form-control" placeholder="499" value="0">
+            </div>
+            <div class="form-group">
+              <label>Max Discount (₹)</label>
+              <input type="number" id="coupon-max-discount" class="form-control" placeholder="500" value="500">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Description (Optional)</label>
+            <input type="text" id="coupon-desc" class="form-control" placeholder="e.g. Get 20% OFF on festive collection">
           </div>
         </div>
         <div class="modal-footer">

@@ -1,5 +1,6 @@
 /**
  * StyleHub Admin Portal - Coupons Controller
+ * Full support for PERCENTAGE & FLAT discount types, min order values, and active limits
  */
 
 const Coupons = {
@@ -22,7 +23,7 @@ const Coupons = {
         this.renderTable(this.list);
       }
     } catch (err) {
-      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:30px; color:#ef4444;">Failed to load coupons.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:30px; color:#ef4444;">Failed to load coupons. Ensure you have Admin privileges.</td></tr>';
     }
   },
 
@@ -34,6 +35,7 @@ const Coupons = {
       tbody.innerHTML = `
         <tr>
           <td colspan="5" style="text-align:center; padding:40px; color:#94a3b8;">
+            <i class="fas fa-ticket-alt" style="font-size:36px; color:#fbcfe8; margin-bottom:12px; display:block;"></i>
             No coupons found. Click <strong>+ Create Coupon</strong> to add promotional discount codes.
           </td>
         </tr>
@@ -41,27 +43,58 @@ const Coupons = {
       return;
     }
 
-    tbody.innerHTML = coupons.map(c => `
-      <tr>
-        <td><span class="badge" style="background:#d81b60; color:white; font-size:13px;">${c.code}</span></td>
-        <td style="font-weight:700; color:#10b981;">${c.discountPercentage ? c.discountPercentage + '%' : '₹' + c.discountAmount} OFF</td>
-        <td style="color:#94a3b8;">Min Order: ₹${c.minOrderAmount || 0}</td>
-        <td>
-          <span class="badge ${c.active !== false ? 'badge-delivered' : 'badge-cancelled'}">
-            ${c.active !== false ? 'ACTIVE' : 'INACTIVE'}
-          </span>
-        </td>
-        <td>
-          <button class="btn-icon delete" title="Delete Coupon" onclick="Coupons.deleteCoupon('${c.id}', '${c.code}')">
-            <i class="fas fa-trash-alt"></i>
-          </button>
-        </td>
-      </tr>
-    `).join('');
+    tbody.innerHTML = coupons.map(c => {
+      const isPercent = (c.discountType || '').toUpperCase() === 'PERCENTAGE';
+      const discountText = isPercent ? `${c.discountValue}% OFF` : `₹${c.discountValue} FLAT OFF`;
+      const minOrderText = c.minOrderValue ? `Min Order: ₹${c.minOrderValue}` : 'No Min Order';
+
+      return `
+        <tr>
+          <td>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span class="badge" style="background:#d81b60; color:white; font-size:13px; font-weight:800; letter-spacing:1px;">
+                <i class="fas fa-tag"></i> ${this.escapeHtml(c.code)}
+              </span>
+            </div>
+            <div style="font-size:11px; color:#64748b; margin-top:4px;">${this.escapeHtml(c.description || '')}</div>
+          </td>
+          <td style="font-weight:800; color:#0f8a5f; font-size:14px;">${discountText}</td>
+          <td style="color:#64748b; font-weight:600;">${minOrderText}</td>
+          <td>
+            <span class="badge ${c.active !== false ? 'badge-delivered' : 'badge-cancelled'}">
+              ${c.active !== false ? 'ACTIVE' : 'INACTIVE'}
+            </span>
+          </td>
+          <td>
+            <button class="btn-icon delete" title="Delete Coupon" onclick="Coupons.deleteCoupon('${c.id}', '${this.escapeHtml(c.code)}')">
+              <i class="fas fa-trash-alt" style="color:#e11d48;"></i>
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  },
+
+  onTypeChange(type) {
+    const label = document.getElementById('coupon-val-label');
+    const input = document.getElementById('coupon-discount');
+    if (type === 'PERCENTAGE') {
+      label.textContent = 'Discount Value (%) *';
+      input.placeholder = '20';
+      input.max = '100';
+    } else {
+      label.textContent = 'Flat Discount Amount (₹) *';
+      input.placeholder = '200';
+      input.removeAttribute('max');
+    }
   },
 
   openAddModal() {
     document.getElementById('coupon-form').reset();
+    document.getElementById('coupon-type').value = 'PERCENTAGE';
+    this.onTypeChange('PERCENTAGE');
+    document.getElementById('coupon-min-order').value = '499';
+    document.getElementById('coupon-max-discount').value = '500';
     document.getElementById('coupon-modal').classList.add('active');
   },
 
@@ -72,22 +105,32 @@ const Coupons = {
   async handleFormSubmit(e) {
     e.preventDefault();
     const code = document.getElementById('coupon-code').value.trim().toUpperCase();
-    const discount = parseFloat(document.getElementById('coupon-discount').value);
-    const minOrder = parseFloat(document.getElementById('coupon-min-order').value) || 0;
+    const discountType = document.getElementById('coupon-type').value;
+    const discountValue = parseFloat(document.getElementById('coupon-discount').value);
+    const minOrderValue = parseFloat(document.getElementById('coupon-min-order').value) || 0;
+    const maxDiscountAmount = parseFloat(document.getElementById('coupon-max-discount').value) || 500;
+    const description = document.getElementById('coupon-desc').value.trim() || `${discountValue}${discountType === 'PERCENTAGE' ? '%' : '₹'} OFF on orders above ₹${minOrderValue}`;
 
-    if (!code || isNaN(discount)) {
-      Toast.error('Please enter valid coupon code and discount percentage.');
+    if (!code || isNaN(discountValue)) {
+      Toast.error('Please enter valid coupon code and discount amount.');
       return;
     }
 
+    const payload = {
+      code,
+      description,
+      discountType,
+      discountValue,
+      minOrderValue,
+      maxDiscountAmount,
+      usageLimit: 1000,
+      validFrom: new Date().toISOString(),
+      validUntil: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString()
+    };
+
     try {
-      await API.post('/api/admin/coupons', {
-        code,
-        discountPercentage: discount,
-        minOrderAmount: minOrder,
-        active: true
-      });
-      Toast.success(`Coupon ${code} created successfully!`);
+      await API.post('/api/admin/coupons', payload);
+      Toast.success(`Coupon "${code}" created successfully!`);
       this.closeModal();
       await this.fetchCoupons();
     } catch (err) {
@@ -96,13 +139,18 @@ const Coupons = {
   },
 
   async deleteCoupon(id, code) {
-    if (!confirm(`Delete coupon "${code}"?`)) return;
+    if (!confirm(`Are you sure you want to deactivate coupon "${code}"?`)) return;
     try {
       await API.delete(`/api/admin/coupons/${id}`);
-      Toast.success('Coupon deleted.');
+      Toast.success(`Coupon "${code}" deactivated.`);
       await this.fetchCoupons();
     } catch (err) {
       console.error('Failed to delete coupon:', err);
     }
+  },
+
+  escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 };
