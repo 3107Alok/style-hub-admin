@@ -92,6 +92,10 @@
           <i class="fas fa-ticket-alt"></i>
           <span>Coupons & Offers</span>
         </a>
+        <a class="nav-item" data-tab="users">
+          <i class="fas fa-users-cog"></i>
+          <span>Users & Customers</span>
+        </a>
       </nav>
 
       <div class="sidebar-footer">
@@ -306,6 +310,56 @@
           </div>
         </div>
 
+        <!-- USERS & CUSTOMER MANAGEMENT VIEW -->
+        <div id="view-users" class="tab-view" style="display:none;">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Users & Customers</h1>
+              <p class="page-subtitle">Manage registered customer accounts, administrative access, and block list</p>
+            </div>
+            <div style="display:flex; gap:10px;">
+              <button class="btn btn-outline" onclick="Users.load()">
+                <i class="fas fa-sync-alt"></i> Refresh Users
+              </button>
+            </div>
+          </div>
+
+          <!-- Controls Bar -->
+          <div class="control-bar">
+            <div class="search-input-wrapper">
+              <i class="fas fa-search search-icon"></i>
+              <input type="text" id="users-search" class="search-input" placeholder="Search by name, email, or phone..." oninput="Users.filterUsers(this.value)" />
+            </div>
+
+            <div style="display:flex; gap:10px; align-items:center;">
+              <select id="users-role-filter" class="form-control" style="width:160px; padding:9px 14px;" onchange="Users.filterByRole(this.value)">
+                <option value="ALL">All Roles</option>
+                <option value="ADMIN">Admins Only</option>
+                <option value="CUSTOMER">Customers Only</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>User Profile</th>
+                  <th>Contact Number</th>
+                  <th>System Role</th>
+                  <th>Verifications</th>
+                  <th>Account Status</th>
+                  <th>Joined Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="users-table-body">
+                <!-- Dynamically loaded -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
       </div>
     </main>
   </div>
@@ -477,6 +531,7 @@
   <script src="js/orders.js?v=2.0"></script>
   <script src="js/categories.js?v=2.0"></script>
   <script src="js/coupons.js?v=2.0"></script>
+  <script src="js/users.js?v=2.0"></script>
   <script src="js/app.js?v=2.0"></script>
 </body>
 </html>

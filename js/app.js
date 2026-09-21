@@ -90,7 +90,8 @@ const App = {
       products: 'Product Management',
       orders: 'Customer Orders',
       categories: 'Store Categories',
-      coupons: 'Promotional Coupons'
+      coupons: 'Promotional Coupons',
+      users: 'User & Customer Management'
     };
     const titleEl = document.getElementById('header-title-text');
     if (titleEl) titleEl.textContent = titles[tabName] || 'Dashboard';
@@ -114,6 +115,9 @@ const App = {
         break;
       case 'coupons':
         Coupons.load();
+        break;
+      case 'users':
+        Users.load();
         break;
     }
   }
