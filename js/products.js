@@ -83,7 +83,9 @@ const Products = {
           <td>${stockBadge}</td>
           <td>
             ${p.featured ? '<span class="badge badge-placed" style="margin-right:4px;">⭐ Featured</span>' : ''}
-            ${p.flashSale ? '<span class="badge badge-processing" style="background:#fff3e0; color:#b45309;">⚡ Sale</span>' : ''}
+            <button class="badge" style="cursor:pointer; border:1px solid ${p.flashSale ? '#f59e0b' : '#d1d5db'}; font-weight:700; ${p.flashSale ? 'background:#fff3e0; color:#b45309;' : 'background:#f9fafb; color:#6b7280;'}" onclick="Products.toggleFlashSale('${p.id}')" title="Click to toggle Flash Sale ON/OFF">
+              ⚡ ${p.flashSale ? 'Sale: Active' : 'Sale: Off'}
+            </button>
           </td>
           <td>
             <div class="action-btn-group">
@@ -162,8 +164,40 @@ const Products = {
     Toast.success(`Applied ${category.toUpperCase()} preset photo!`);
   },
 
+  colorImagesMap: {},
+
+  renderColorImageInputs(existingMap = null) {
+    const container = document.getElementById('color-variant-images-container');
+    if (!container) return;
+
+    if (existingMap) {
+      this.colorImagesMap = { ...existingMap };
+    }
+
+    const colorsStr = document.getElementById('prod-colors').value || '';
+    const colors = colorsStr.split(',').map(c => c.trim()).filter(c => c.length > 0);
+
+    if (colors.length === 0) {
+      container.innerHTML = '<div style="font-size:12px; color:#999; font-style:italic;">Enter colors above to add color-specific photos.</div>';
+      return;
+    }
+
+    container.innerHTML = colors.map((col, idx) => {
+      const existingVal = this.colorImagesMap[col] ? (Array.isArray(this.colorImagesMap[col]) ? this.colorImagesMap[col].join(', ') : this.colorImagesMap[col]) : '';
+      return `
+        <div style="display:flex; align-items:center; gap:8px; background:white; padding:6px 10px; border-radius:8px; border:1px solid #fbcfe8;">
+          <span class="badge" style="background:#fce4ec; color:#be185d; font-weight:700; min-width:80px; font-size:11px;">
+            ${this.escapeHtml(col)}
+          </span>
+          <input type="text" class="form-control color-variant-input" data-color="${this.escapeHtml(col)}" placeholder="Photo URL(s) for ${this.escapeHtml(col)} (comma-separated)" value="${this.escapeHtml(existingVal)}" style="padding:4px 8px; font-size:12px;" />
+        </div>
+      `;
+    }).join('');
+  },
+
   openAddModal() {
     this.currentEditId = null;
+    this.colorImagesMap = {};
     document.getElementById('product-modal-title').textContent = 'Add New Product';
     document.getElementById('product-form').reset();
     document.getElementById('prod-brand').value = 'StyleHub';
@@ -171,6 +205,7 @@ const Products = {
     document.getElementById('prod-sizes').value = 'S, M, L, XL';
     document.getElementById('prod-colors').value = 'Black, Navy Blue, Beige';
     this.previewImage('');
+    this.renderColorImageInputs();
     document.getElementById('product-modal').classList.add('active');
   },
 
@@ -196,8 +231,13 @@ const Products = {
     this.previewImage(imgUrl);
 
     // Pre-fill sizes and colors defaults
-    document.getElementById('prod-sizes').value = 'S, M, L, XL, XXL';
-    document.getElementById('prod-colors').value = 'Black, Beige, Navy Blue';
+    const sizes = (product.sizes && product.sizes.length > 0) ? product.sizes.join(', ') : 'S, M, L, XL, XXL';
+    const colors = (product.colors && product.colors.length > 0) ? product.colors.join(', ') : 'Black, Beige, Navy Blue';
+    document.getElementById('prod-sizes').value = sizes;
+    document.getElementById('prod-colors').value = colors;
+
+    // Render color variant photos
+    this.renderColorImageInputs(product.colorImages || {});
 
     // Set category if matched
     const catSelect = document.getElementById('prod-category');
@@ -222,6 +262,34 @@ const Products = {
     const categoryId = document.getElementById('prod-category').value;
     const imageUrl = document.getElementById('prod-image').value.trim();
 
+    // Collect sizes & colors
+    const sizes = (document.getElementById('prod-sizes').value || '')
+      .split(',')
+      .map(s => s.trim())
+      .filter(s => s.length > 0);
+
+    const colors = (document.getElementById('prod-colors').value || '')
+      .split(',')
+      .map(c => c.trim())
+      .filter(c => c.length > 0);
+
+    // Collect Color Variant Images
+    const colorImages = {};
+    const allImages = imageUrl ? [imageUrl] : [];
+    document.querySelectorAll('.color-variant-input').forEach(input => {
+      const col = input.getAttribute('data-color');
+      const val = input.value.trim();
+      if (col && val) {
+        const urls = val.split(',').map(u => u.trim()).filter(u => u.length > 0);
+        if (urls.length > 0) {
+          colorImages[col] = urls;
+          urls.forEach(u => {
+            if (!allImages.includes(u)) allImages.push(u);
+          });
+        }
+      }
+    });
+
     const body = {
       title: document.getElementById('prod-title').value.trim(),
       description: document.getElementById('prod-description').value.trim(),
@@ -231,12 +299,12 @@ const Products = {
       stock: parseInt(document.getElementById('prod-stock').value, 10) || 0,
       categoryId: categoryId || null,
       featured: document.getElementById('prod-featured').checked,
-      flashSale: document.getElementById('prod-flash-sale').checked
+      flashSale: document.getElementById('prod-flash-sale').checked,
+      sizes: sizes,
+      colors: colors,
+      colorImages: colorImages,
+      images: allImages
     };
-
-    if (imageUrl) {
-      body.images = [imageUrl];
-    }
 
     try {
       if (this.currentEditId) {
@@ -267,6 +335,31 @@ const Products = {
       await this.fetchProducts();
     } catch (err) {
       console.error('Failed to delete product:', err);
+    }
+  },
+
+  async toggleFlashSale(id) {
+    const product = this.list.find(p => p.id === id);
+    if (!product) return;
+    try {
+      const updatedFlashSale = !product.flashSale;
+      await API.put(`/api/admin/products/${id}`, {
+        title: product.title,
+        description: product.description,
+        brand: product.brand,
+        price: product.price,
+        discountPrice: product.discountPrice,
+        stock: product.stock,
+        categoryId: product.categoryId,
+        featured: product.featured,
+        flashSale: updatedFlashSale,
+        images: product.images
+      });
+      product.flashSale = updatedFlashSale;
+      Toast.success(`Flash sale ${updatedFlashSale ? 'activated' : 'deactivated'} for "${product.title}"`);
+      this.renderTable(this.list);
+    } catch(err) {
+      console.error('Failed to toggle flash sale:', err);
     }
   },
 
